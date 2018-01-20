@@ -1,4 +1,3 @@
-console.log('router');
 const express = require('express');
 const dataController = require('../controllers/data_controller.js');
 

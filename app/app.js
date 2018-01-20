@@ -1,7 +1,7 @@
-console.log('app');
 const express = require('express');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+
 const dataRouter = require('./routes/data_router.js');
 
 const app = express();
