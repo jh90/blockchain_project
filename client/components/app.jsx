@@ -7,62 +7,80 @@ export default class App extends React.Component {
   constructor () {
     super();
     this.state = {
-      balance: '',
-      transactions: [],
+      websocket: null,
+      address: null,
+      addressData: null,
+      showDisplay: false,
       isLoading: false,
-      socketOpen: false,
+      channelOpen: false,
     };
     this.handleSearch = this.handleSearch.bind(this);
-    this.getBalanceAndTransactions = this.getBalanceAndTransactions.bind(this);
-    this.openWebSocket = this.openWebSocket.bind(this);
   }
 
-  openWebSocket (address) {
-    console.log(this.state.balance);
-    const connection = new WebSocket('wss://ws.blockchain.info/inv');
+  componentDidMount () {
+    this.openSocket();
+  }
+
+  openSocket() {
+    const btcWebsocketURL = 'wss://ws.blockchain.info/inv';
+    const connection = new WebSocket(btcWebsocketURL);
     connection.onopen = () => {
-      console.log('open');
-      const openChannelMessage = {'op': 'addr_sub', 'addr': address};
-      connection.send(JSON.stringify(openChannelMessage));
-    };
+      this.setState({ websocket: connection });
+      console.log('socket open');
+    }
     connection.onclose = () => {
-      console.log('closed');
+      console.log('socket closed');
     }
     connection.onerror = (error) => {
-      console.log(`error: ${error}`);
-    };
-    connection.onmessage = (message) => {
-      console.log(message);
+      console.log(`ERROR: ${error}`);
+    }
+    connection.onmessage = () => {
+      this.getBalanceAndTransactions(this.state.address);
     }
   }
 
-  getBalanceAndTransactions (address) {
-    request.get(`/data?address=${address}`)
+  openChannel (address) {
+    const subscribeMessage = `{'op':'sub_addr', 'addr':'${address}'}`;
+    this.state.websocket.send(subscribeMessage);
+    this.setState({ channelOpen: true });
+  }
+
+  closeChannel () {
+    const unsubscribeMessage = `{'op':'unsub_addr', 'addr':'${this.state.address}'}`;
+    this.state.websocket.send(unsubscribeMessage);
+  }
+
+  getBalanceAndTransactions (bitcoinAddress) {
+    request.get(`/data?address=${bitcoinAddress}`)
            .then((response) => {
-              console.log(response);
-              const cleanData = JSON.parse(response.text);
-              console.log(cleanData);
+              const data = JSON.parse(response.text);
               this.setState({
-                balance: cleanData.balance,
-                transactions: cleanData.transactions,
+                address: bitcoinAddress,
+                addressData: data,
                 isLoading: false,
               });
-              this.openWebSocket(address);
+              this.openChannel(bitcoinAddress);
            });
   }
 
   handleSearch (address) {
-    this.setState({isLoading: true});
+    if (this.state.channelOpen) {
+      this.closeChannel();
+    }
+    this.setState({ showDisplay: true, isLoading: true });
     this.getBalanceAndTransactions(address);
   }
 
   render () {
+    const display = this.state.showDisplay;
     return (
       <div>
         <SearchContainer handleSearch={this.handleSearch} />
-        <DisplayContainer isLoading={this.state.isLoading}
-                          balance={this.state.balance}
-                          transactions={this.state.transactions} />
+        {
+          display ? <DisplayContainer data={this.state.addressData}
+                                      loading={this.state.isLoading} />
+                  : false
+        }
       </div>
     );
   }

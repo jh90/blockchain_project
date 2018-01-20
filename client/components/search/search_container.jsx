@@ -1,25 +1,23 @@
 import React from 'react';
-
 import SearchView from './search_view.jsx';
 
 export default class SearchContainer extends React.Component {
   constructor () {
     super();
     this.state = {
-      address: '',
+      query: '',
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange (event) {
-    event.preventDefault();
     const input = event.target.value;
-    this.setState({address: input});
+    this.setState({query: input});
   }
 
   handleSubmit () {
-    this.props.handleSearch(this.state.address);
+    this.props.handleSearch(this.state.query);
   }
 
   render () {

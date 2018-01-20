@@ -1,23 +1,13 @@
 import React from 'react';
+import LoadingView from './loading_view.jsx';
 
-export default class DisplayView extends React.Component {
-  constructor () {
-    super();
-    this.state = {};
+const DisplayView = function (props) {
+  if (props.loading) {
+    return <LoadingView />;
   }
-
-  render () {
-    return (
-      <div>
-        <div>{this.props.balance}</div>
-        <ul>
-        {
-          this.props.transactions.map((tx) => {
-            return (<li>{tx}</li>);
-          })
-        }
-        </ul>
-      </div>
-    );
+  else {
+    return <div>{props.balance}</div>
   }
 }
+
+export default DisplayView;

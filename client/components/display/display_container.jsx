@@ -1,25 +1,12 @@
 import React from 'react';
 
-export default class DisplayContainer extends React.Component {
-  constructor () {
-    super();
-    this.state = {};
+const DisplayContainer = (props) => {
+  if (props.loading) {
+    return <div>LOADING</div>;
   }
-
-  render () {
-    const loading = this.props.isLoading;
-    const balance = this.props.balance;
-    const transactions = this.props.transactions;
-    console.log(loading);
-    console.log(balance);
-    if (transactions.length > 1) {
-      console.log('display has transactions');
-    }
-    return (
-      <ul>
-        <li>{loading}</li>
-        <li>{balance}</li>
-      </ul>
-    );
+  else {
+    return <div>{props.data.balance}</div>;
   }
 }
+
+export default DisplayContainer;
