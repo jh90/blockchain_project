@@ -3,6 +3,7 @@ const dataController = require('../controllers/data_controller.js');
 
 const router = express.Router();
 
-router.get('/:address', dataController.getBalanceAndHistory);
+router.get('/', dataController.getBalanceAndHistory);
+console.log('hit');
 
 module.exports = router;

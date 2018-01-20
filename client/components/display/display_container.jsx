@@ -11,10 +11,12 @@ export default class DisplayContainer extends React.Component {
   render () {
     const loading = this.props.isLoading;
     const balance = this.props.balance;
+    const transactions = this.props.transactions;
     return (
       <div>
         {loading ? <LoadingView /> :
-                   <DisplayView balance={this.props.balance} />}
+                   <DisplayView balance={this.props.balance}
+                                transactions={this.props.transactions} />}
       </div>
     );
   }

@@ -976,8 +976,6 @@ var _app2 = _interopRequireDefault(_app);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-console.log('index');
-
 _reactDom2.default.render(_react2.default.createElement(_app2.default, null), document.querySelector('#root'));
 
 /***/ }),
@@ -18354,16 +18352,10 @@ var App = function (_React$Component) {
     value: function getBalanceAndTransactions(address) {
       var _this2 = this;
 
-      var URL = 'https://blockchain.info/rawaddr/' + address + '&cors=true';
-      console.log(URL);
-      _superagent2.default.get(URL).then(function (response) {
-        var _response$body = response.body,
-            final_balance = _response$body.final_balance,
-            txs = _response$body.txs;
-
+      _superagent2.default.get('/data?address=' + address).then(function (response) {
         _this2.setState({
-          balance: final_balance,
-          transactions: txs,
+          balance: response.balance,
+          transactions: response.transactions,
           isLoading: false
         });
         _this2.openWebSocket(address);
@@ -20621,10 +20613,12 @@ var DisplayContainer = function (_React$Component) {
     value: function render() {
       var loading = this.props.isLoading;
       var balance = this.props.balance;
+      var transactions = this.props.transactions;
       return _react2.default.createElement(
         'div',
         null,
-        loading ? _react2.default.createElement(_loading_view2.default, null) : _react2.default.createElement(_display_view2.default, { balance: this.props.balance })
+        loading ? _react2.default.createElement(_loading_view2.default, null) : _react2.default.createElement(_display_view2.default, { balance: this.props.balance,
+          transactions: this.props.transactions })
       );
     }
   }]);
@@ -20677,7 +20671,22 @@ var DisplayView = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         null,
-        this.props.balance
+        _react2.default.createElement(
+          'div',
+          null,
+          this.props.balance
+        ),
+        _react2.default.createElement(
+          'ul',
+          null,
+          this.props.transactions.map(function (tx) {
+            return _react2.default.createElement(
+              'li',
+              null,
+              tx
+            );
+          })
+        )
       );
     }
   }]);

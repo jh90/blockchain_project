@@ -1,6 +1,5 @@
 import React from 'react';
 import request from 'superagent';
-
 import SearchContainer from './search/search_container.jsx';
 import DisplayContainer from './display/display_container.jsx';
 
@@ -22,14 +21,11 @@ export default class App extends React.Component {
   }
 
   getBalanceAndTransactions (address) {
-    const URL = 'https://blockchain.info/rawaddr/' + address + '&cors=true';
-    console.log(URL);
-    request.get(URL)
+    request.get(`/data?address=${address}`)
            .then((response) => {
-              const {final_balance, txs} = response.body;
               this.setState({
-                balance: final_balance,
-                transactions: txs,
+                balance: response.balance,
+                transactions: response.transactions,
                 isLoading: false,
               });
               this.openWebSocket(address);

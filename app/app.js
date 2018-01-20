@@ -11,6 +11,6 @@ app.use(bodyParser.json());
 
 app.use(morgan('dev'));
 
-app.use('/api/data', dataRouter);
+app.use('/data', dataRouter);
 
 module.exports = app;
