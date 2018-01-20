@@ -1,7 +1,7 @@
 const request = require('superagent');
 
 class BlockchainDAO {
-  static singleAddress ({ address }) {
+  static singleAddress (address) {
     const apiURL = 'http://blockchain.info/rawaddr/';
     return request.get(`${apiURL}${address}`)
            .then((response) => {

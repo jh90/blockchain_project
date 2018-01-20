@@ -9,23 +9,42 @@ export default class App extends React.Component {
     this.state = {
       balance: '',
       transactions: [],
-      isLoading: null,
+      isLoading: false,
       socketOpen: false,
     };
     this.handleSearch = this.handleSearch.bind(this);
     this.getBalanceAndTransactions = this.getBalanceAndTransactions.bind(this);
+    this.openWebSocket = this.openWebSocket.bind(this);
   }
 
   openWebSocket (address) {
-    console.log(address);
+    console.log(this.state.balance);
+    const connection = new WebSocket('wss://ws.blockchain.info/inv');
+    connection.onopen = () => {
+      console.log('open');
+      const openChannelMessage = {'op': 'addr_sub', 'addr': address};
+      connection.send(JSON.stringify(openChannelMessage));
+    };
+    connection.onclose = () => {
+      console.log('closed');
+    }
+    connection.onerror = (error) => {
+      console.log(`error: ${error}`);
+    };
+    connection.onmessage = (message) => {
+      console.log(message);
+    }
   }
 
   getBalanceAndTransactions (address) {
     request.get(`/data?address=${address}`)
            .then((response) => {
+              console.log(response);
+              const cleanData = JSON.parse(response.text);
+              console.log(cleanData);
               this.setState({
-                balance: response.balance,
-                transactions: response.transactions,
+                balance: cleanData.balance,
+                transactions: cleanData.transactions,
                 isLoading: false,
               });
               this.openWebSocket(address);

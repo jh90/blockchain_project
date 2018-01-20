@@ -1,6 +1,4 @@
 import React from 'react';
-import DisplayView from './display_view.jsx';
-import LoadingView from './loading_view.jsx';
 
 export default class DisplayContainer extends React.Component {
   constructor () {
@@ -12,12 +10,16 @@ export default class DisplayContainer extends React.Component {
     const loading = this.props.isLoading;
     const balance = this.props.balance;
     const transactions = this.props.transactions;
+    console.log(loading);
+    console.log(balance);
+    if (transactions.length > 1) {
+      console.log('display has transactions');
+    }
     return (
-      <div>
-        {loading ? <LoadingView /> :
-                   <DisplayView balance={this.props.balance}
-                                transactions={this.props.transactions} />}
-      </div>
+      <ul>
+        <li>{loading}</li>
+        <li>{balance}</li>
+      </ul>
     );
   }
 }

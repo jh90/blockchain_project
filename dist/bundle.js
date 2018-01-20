@@ -18353,6 +18353,7 @@ var App = function (_React$Component) {
       var _this2 = this;
 
       _superagent2.default.get('/data?address=' + address).then(function (response) {
+        console.log(response);
         _this2.setState({
           balance: response.balance,
           transactions: response.transactions,
