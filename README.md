@@ -21,3 +21,11 @@ openWebSocket (address) {
       console.log(message);
     }
   }
+
+<ul>
+        {
+          props.data.transactions.map((tx) => {
+            return <li>{tx.time}</li>;
+          })
+        }
+      </ul>

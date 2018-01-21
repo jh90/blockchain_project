@@ -18328,9 +18328,9 @@ var App = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
 
     _this.state = {
-      address: null,
       showDisplay: false,
-      websocket: null
+      websocket: null,
+      address: null
     };
     _this.handleSearch = _this.handleSearch.bind(_this);
     return _this;
@@ -18357,9 +18357,6 @@ var App = function (_React$Component) {
       };
       connection.onerror = function (error) {
         console.log('ERROR: ' + error);
-      };
-      connection.onmessage = function () {
-        _this2.getBalanceAndTransactions(_this2.state.address);
       };
     }
   }, {
@@ -18567,9 +18564,9 @@ var DisplayContainer = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (DisplayContainer.__proto__ || Object.getPrototypeOf(DisplayContainer)).call(this));
 
     _this.state = {
-      websocket: null,
       addressData: null,
-      isLoading: true
+      isLoading: true,
+      pageCount: 1
     };
     return _this;
   }
@@ -18577,7 +18574,12 @@ var DisplayContainer = function (_React$Component) {
   _createClass(DisplayContainer, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      var _this2 = this;
+
       this.getBalanceAndTransactions(this.props.address);
+      this.props.socket.onmessage = function () {
+        _this2.getBalanceAndTransactions(_this2.props.address);
+      };
     }
   }, {
     key: 'componentWillReceiveProps',
@@ -18596,21 +18598,21 @@ var DisplayContainer = function (_React$Component) {
   }, {
     key: 'closeChannel',
     value: function closeChannel(address) {
-      var unsubscribeMessage = '{\'op\':\'unsub_addr\', \'addr\':\'' + this.state.address + '\'}';
+      var unsubscribeMessage = '{\'op\':\'unsub_addr\', \'addr\':\'' + address + '\'}';
       this.props.socket.send(unsubscribeMessage);
     }
   }, {
     key: 'getBalanceAndTransactions',
     value: function getBalanceAndTransactions(address) {
-      var _this2 = this;
+      var _this3 = this;
 
       _superagent2.default.get('/data?address=' + address).then(function (response) {
         var data = JSON.parse(response.text);
-        _this2.setState({
+        _this3.setState({
           addressData: data,
           isLoading: false
         });
-        _this2.openChannel(address);
+        _this3.openChannel(address);
       });
     }
   }, {
@@ -20679,7 +20681,7 @@ module.exports = Agent;
 
 
 Object.defineProperty(exports, "__esModule", {
-    value: true
+  value: true
 });
 
 var _react = __webpack_require__(0);
@@ -20689,11 +20691,23 @@ var _react2 = _interopRequireDefault(_react);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var DisplayView = function DisplayView(props) {
-    return _react2.default.createElement(
-        'div',
-        null,
-        props.data.balance
-    );
+  return;
+  _react2.default.createElement(
+    'div',
+    null,
+    props.data.balance,
+    _react2.default.createElement(
+      'ul',
+      null,
+      props.data.transactions.map(function (tx) {
+        return _react2.default.createElement(
+          'li',
+          null,
+          tx.time
+        );
+      })
+    )
+  );
 };
 
 exports.default = DisplayView;
