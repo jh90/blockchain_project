@@ -1,13 +1,7 @@
 import React from 'react';
-import LoadingView from './loading_view.jsx';
 
 const DisplayView = function (props) {
-  if (props.loading) {
-    return <LoadingView />;
-  }
-  else {
-    return <div>{props.balance}</div>
-  }
+    return <div>{props.data.balance}</div>;
 }
 
 export default DisplayView;
