@@ -14,6 +14,9 @@ export default class DisplayContainer extends React.Component {
 
   componentDidMount () {
     this.getBalanceAndTransactions(this.props.address);
+    this.props.socket.onmessage = () => {
+      this.getBalanceAndTransactions(this.props.address);
+    }
   }
 
   componentWillReceiveProps (nextProps) {

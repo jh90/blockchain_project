@@ -30,9 +30,6 @@ export default class App extends React.Component {
     connection.onerror = (error) => {
       console.log(`ERROR: ${error}`);
     }
-    connection.onmessage = () => {
-      this.getBalanceAndTransactions(this.state.address);
-    }
   }
 
   handleSearch (bitcoinAddress) {
