@@ -10,16 +10,20 @@ export default class DisplayContainer extends React.Component {
     this.state = {
       balance: null,
       transactions: null,
+      totalTxs: null,
       isLoading: true,
       pageCount: 1,
+      descending: true,
+      areMore: false,
     }
     this.getMoreTransactions = this.getMoreTransactions.bind(this);
+    this.toggleTransactionOrder = this.toggleTransactionOrder.bind(this);
   }
 
   componentDidMount () {
     this.getBalanceAndTransactions(this.props.address);
-    this.props.socket.onmessage = () => {
-      this.getBalanceAndTransactions(this.props.address);
+    this.props.socket.onmessage = (data) => {
+      this.handleNewTransaction(data);
     }
   }
 
@@ -86,10 +90,16 @@ export default class DisplayContainer extends React.Component {
               const cleanTxs = data.transactions.map((tx) => {
                 return this.cleanTransactionData(tx);
               });
+              let showMore = false;
+              if (data.totalTxs > (this.state.pageNumber * 50)) {
+                showMore = true;
+              }
               this.setState({
                 balance: data.balance,
                 transactions: cleanTxs,
+                totalTxs: data.totalTxs,
                 isLoading: false,
+                areMore: showMore,
               });
               this.openChannel(address);
            });
@@ -106,11 +116,34 @@ export default class DisplayContainer extends React.Component {
               });
               const newTxs = [].concat(this.state.transactions, cleanTxs);
               const newPageCount = (offset / 50) + 1;
+              console.log(newPageCount);
               this.setState({
                 transactions: newTxs,
                 pageCount: newPageCount,
               });
            });
+  }
+
+  handleNewTransaction (tx) {
+    const stateClone = Object.assign({}, this.state);
+    const cleanTx = this.cleanTransactionData(tx);
+    if (this.state.descending) {
+      stateClone.transactions.unshift(cleanTx);
+    }
+    else {
+      stateClone.transactions.push(cleanTx);
+    }
+    this.setState({ transactions: stateClone.transactions });
+  }
+
+  toggleTransactionOrder () {
+    const stateClone = Object.assign({}, this.state);
+    const reverseOrder = stateClone.transactions.reverse();
+    const newOrder = !stateClone.descending;
+    this.setState({
+      transactions: reverseOrder,
+      descending: newOrder,
+    });
   }
 
   render () {
@@ -121,7 +154,10 @@ export default class DisplayContainer extends React.Component {
         loading ? <LoadingView />
                 : <DisplayView balance={this.state.balance}
                                transactions={this.state.transactions}
-                               seeMore={this.getMoreTransactions} />
+                               loadMore={this.getMoreTransactions}
+                               descending={this.state.descending}
+                               handleToggle={this.toggleTransactionOrder}
+                               areMoreTxs={this.state.areMore} />
       }
       </div>
     );

@@ -6,8 +6,12 @@ const getBalanceAndTransactions = function (req, res) {
     const URL = `http://blockchain.info/rawaddr/${address}?offset=${offset}`;
     request.get(URL)
            .then((response) => {
-              const { final_balance, txs } = response.body;
-              const addressData = { balance: final_balance, transactions: txs };
+              const { final_balance, txs, n_tx } = response.body;
+              const addressData = {
+                balance: final_balance,
+                transactions: txs,
+                totalTxs: n_tx,
+              };
               res.status(200).send(addressData);
            });
 }

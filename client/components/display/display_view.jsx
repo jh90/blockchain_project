@@ -1,10 +1,14 @@
 import React from 'react';
+import DisplayHeader from './display_header.jsx'
 import TransactionView from './transaction_view.jsx';
 
 const DisplayView = (props) => {
+    const showMoreButton = props.areMoreTxs;
     return (
       <div id='display'>
-        <div id='balance-div'>Balance: <span id='balance'>{props.balance} BTC</span></div>
+        <DisplayHeader balance={props.balance}
+                       descending={props.descending}
+                       handleToggle={props.handleToggle} />
         {
           props.transactions.map((tx) => {
             return (
@@ -12,7 +16,10 @@ const DisplayView = (props) => {
             );
           })
         }
-        <button id='more' onClick={props.seeMore}>See More</button>
+        {
+          showMoreButton ? <button onClick={props.loadMore}>See More</button>
+                 : false
+        }
       </div>
     );
 }

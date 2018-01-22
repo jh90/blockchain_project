@@ -11,11 +11,14 @@
   padding-left: 15px;
 }
 
-#search-button {
-  margin-left: 20px;
+button {
   width: 130px;
   height: 45px;
   font-size: 15px;
+}
+
+#search-button {
+  margin-left: 20px;
 }
 
 #loading {
@@ -25,18 +28,32 @@
 }
 
 #display {
-  margin-top: 25px;
+  margin-top: 35px;
   margin-left: 25px;
-}
-
-#balance-div {
-  margin-bottom: 25px;
-  margin-left: 25px;
-  font-size: 20px;
 }
 
 #balance {
+  margin-bottom: 32px;
+  font-size: 20px;
+}
+
+#balance-text {
   margin-left: 40px;
+}
+
+#txs-header {
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+#toggle {
+  margin-left: 50%;
+  font-size: 20px;
+  padding: 5px;
+  height: 25px;
+  width: 120px;
+  background-color: blue;
+  color: white;
 }
 
 .transaction {
