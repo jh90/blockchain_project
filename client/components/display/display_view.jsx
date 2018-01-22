@@ -3,8 +3,8 @@ import TransactionView from './transaction_view.jsx';
 
 const DisplayView = (props) => {
     return (
-      <div>
-        <h3>Balance: {props.balance}</h3>
+      <div id='display'>
+        <div id='balance'>Balance: {props.balance}</div>
         {
           props.transactions.map((tx) => {
             return (
@@ -12,7 +12,7 @@ const DisplayView = (props) => {
             );
           })
         }
-        <button onClick={props.seeMore}>See More</button>
+        <button id='more' onClick={props.seeMore}>See More</button>
       </div>
     );
 }

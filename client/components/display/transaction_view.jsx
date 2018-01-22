@@ -2,17 +2,28 @@ import React from 'react';
 
 const TransactionView = (props) => {
   return (
-    <div>
-      <h3>{props.tx.direction} {props.tx.value} {props.tx.time}</h3>
-      <ul>
-        {
-          props.tx.counterparties.map((cp) => {
-            return (
-              <li>{cp}</li>
-            );
-          })
-        }
-      </ul>
+    <div className={props.tx.direction}>
+      <table>
+        <tbody>
+          <tr>
+            <th>{props.tx.direction}
+                <span className='time'>{props.tx.time}</span>
+            </th>
+          </tr>
+          <tr>
+            <td>
+              {
+                props.tx.counterparties.map((cp) => {
+                  return (
+                    <p>{cp}</p>
+                  );
+                })
+              }
+            </td>
+            <td className='amount'>{props.tx.value} BTC</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 }

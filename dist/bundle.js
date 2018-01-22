@@ -34844,9 +34844,9 @@ var DisplayContainer = function (_React$Component) {
         return cleanOutput;
       });
       if (txDirection == 'Sent') {
-        txCounterparties = cleanOutputs;
+        txCounterparties = outputs;
       } else {
-        txCounterparties = cleanInputs;
+        txCounterparties = inputs;
       }
       var cleanTx = {
         value: txValue,
@@ -37266,23 +37266,19 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var DisplayView = function DisplayView(props) {
   return _react2.default.createElement(
     'div',
-    null,
+    { id: 'display' },
     _react2.default.createElement(
-      'h3',
-      null,
+      'div',
+      { id: 'balance' },
       'Balance: ',
       props.balance
     ),
-    _react2.default.createElement(
-      'ul',
-      null,
-      props.transactions.map(function (tx) {
-        return _react2.default.createElement(_transaction_view2.default, { tx: tx });
-      })
-    ),
+    props.transactions.map(function (tx) {
+      return _react2.default.createElement(_transaction_view2.default, { tx: tx });
+    }),
     _react2.default.createElement(
       'button',
-      { onClick: props.seeMore },
+      { id: 'more', onClick: props.seeMore },
       'See More'
     )
   );
@@ -37310,26 +37306,45 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var TransactionView = function TransactionView(props) {
   return _react2.default.createElement(
     'div',
-    null,
+    { className: 'transaction' },
     _react2.default.createElement(
-      'h3',
+      'table',
       null,
-      props.tx.direction,
-      ' ',
-      props.tx.value,
-      ' ',
-      props.tx.time
-    ),
-    _react2.default.createElement(
-      'ul',
-      null,
-      props.tx.counterparties.map(function (cp) {
-        return _react2.default.createElement(
-          'li',
+      _react2.default.createElement(
+        'tr',
+        null,
+        _react2.default.createElement(
+          'th',
           null,
-          cp.address
-        );
-      })
+          props.tx.direction,
+          _react2.default.createElement(
+            'span',
+            null,
+            props.tx.time
+          )
+        )
+      ),
+      _react2.default.createElement(
+        'tr',
+        null,
+        _react2.default.createElement(
+          'td',
+          null,
+          props.tx.counterparties.map(function (cp) {
+            return _react2.default.createElement(
+              'p',
+              null,
+              cp
+            );
+          })
+        ),
+        _react2.default.createElement(
+          'td',
+          null,
+          props.tx.value,
+          ' BTC'
+        )
+      )
     )
   );
 };
