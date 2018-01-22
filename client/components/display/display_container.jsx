@@ -1,5 +1,6 @@
 import React from 'react';
 import request from 'superagent';
+import moment from 'moment';
 import DisplayView from './display_view.jsx';
 import LoadingView from './loading_view.jsx';
 
@@ -40,29 +41,40 @@ export default class DisplayContainer extends React.Component {
   }
 
   cleanTransactionData (tx) {
-    const convertedTime = new Date(tx.time * 1000);
+    const parsedTime = moment.unix(tx.time);
+    const displayTime = parsedTime.format("kk:mm:ss YYYY-MM-DD");
     let txDirection;
-    const cleanInputs = tx.inputs.map((input) => {
+    let txValue;
+    let txCounterparties;
+    const inputs = tx.inputs.map((input) => {
+      const btcValue = input.prev_out.value / 100000000;
       if (input.prev_out.addr == this.props.address) {
         txDirection = 'Sent';
+        txValue = btcValue;
       }
-      const cleanValue = input.prev_out.value / 100000000;
-      const cleanInput = { address: input.prev_out.addr, value: cleanValue };
+      const cleanInput = input.prev_out.addr;
       return cleanInput;
     });
-    const cleanOutputs = tx.out.map((output) => {
+    const outputs = tx.out.map((output) => {
+      const btcValue = output.value / 100000000;
       if (output.addr == this.props.address) {
         txDirection = 'Received';
+        txValue = btcValue;
       }
-      const cleanValue = output.value / 100000000;
-      const cleanOutput = { address: output.addr, value: cleanValue };
+      const cleanOutput = output.addr;
       return cleanOutput;
     });
+    if (txDirection == 'Sent') {
+      txCounterparties = outputs;
+    }
+    else {
+      txCounterparties = inputs;
+    }
     const cleanTx = {
-      inputs: cleanInputs,
-      outputs: cleanOutputs,
-      time: convertedTime,
+      value: txValue,
+      time: displayTime,
       direction: txDirection,
+      counterparties: txCounterparties,
     };
     return cleanTx;
 }
