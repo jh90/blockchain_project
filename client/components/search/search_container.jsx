@@ -16,15 +16,18 @@ export default class SearchContainer extends React.Component {
     this.setState({query: input});
   }
 
-  handleSubmit () {
+  handleSubmit (event) {
+    event.preventDefault();
     this.props.handleSearch(this.state.query);
   }
 
   render () {
     return (
       <div>
-        <input onChange={this.handleChange}></input>
-        <p onClick={this.handleSubmit}>Submit</p>
+        <form onSubmit={this.handleSubmit}>
+          <input type='text' placeholder='Address' onChange={this.handleChange} />
+          <button type='submit'>Search</button>
+        </form>
       </div>
     );
   }

@@ -3,7 +3,7 @@ import React from 'react';
 const DisplayView = (props) => {
     return (
       <div>
-        {props.balance}
+        <h3>Balance: {props.balance}</h3>
         <ul>
           {
             props.transactions.map((tx) => {
