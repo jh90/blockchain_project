@@ -8,7 +8,7 @@ const DisplayView = (props) => {
           {
             props.transactions.map((tx) => {
               return (
-                <li>{tx.time}</li>
+                <li>{tx.time.toString()}</li>
               );
             })
           }

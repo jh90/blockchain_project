@@ -18564,10 +18564,12 @@ var DisplayContainer = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (DisplayContainer.__proto__ || Object.getPrototypeOf(DisplayContainer)).call(this));
 
     _this.state = {
-      addressData: null,
+      balance: null,
+      transactions: null,
       isLoading: true,
       pageCount: 1
     };
+    _this.getMoreTransactions = _this.getMoreTransactions.bind(_this);
     return _this;
   }
 
@@ -18602,17 +18604,62 @@ var DisplayContainer = function (_React$Component) {
       this.props.socket.send(unsubscribeMessage);
     }
   }, {
+    key: 'cleanTransactionData',
+    value: function cleanTransactionData(tx) {
+      var convertedTime = new Date(tx.time * 1000);
+      var cleanInputs = tx.inputs.map(function (input) {
+        if (input.address == tx.address) {
+          var _txDirection = 'Sent';
+        }
+        var cleanInput = { address: input.address, value: input.value };
+        return cleanInput;
+      });
+      var cleanOutputs = tx.outputs.map(function (output) {
+        if (output.address == tx.address) {
+          var _txDirection2 = 'Received';
+        }
+        var cleanOutput = { address: output.address, value: output.value };
+        return cleanOutput;
+      });
+      var cleanTx = {
+        inputs: cleanInputs,
+        outputs: cleanOutputs,
+        time: convertedTime,
+        direction: txDirection
+      };
+      return cleantx;
+    }
+  }, {
     key: 'getBalanceAndTransactions',
     value: function getBalanceAndTransactions(address) {
       var _this3 = this;
 
-      _superagent2.default.get('/data?address=' + address).then(function (response) {
+      _superagent2.default.get('/data?address=' + address + '&offset=0').then(function (response) {
         var data = JSON.parse(response.text);
         _this3.setState({
-          addressData: data,
+          balance: data.balance,
+          transactions: data.transactions,
           isLoading: false
         });
         _this3.openChannel(address);
+        console.log(_this3.cleanTransactionData(data.transactions[0]));
+      });
+    }
+  }, {
+    key: 'getMoreTransactions',
+    value: function getMoreTransactions() {
+      var _this4 = this;
+
+      var offset = this.state.pageCount * 50;
+      var address = this.props.address;
+      _superagent2.default.get('/data?address=' + address + '&offset=' + offset).then(function (response) {
+        var data = JSON.parse(response.text);
+        var newTxs = [].concat(_this4.state.transactions, data.transactions);
+        var newPageCount = offset / 50 + 1;
+        _this4.setState({
+          transactions: newTxs,
+          pageCount: newPageCount
+        });
       });
     }
   }, {
@@ -18622,7 +18669,9 @@ var DisplayContainer = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         null,
-        loading ? _react2.default.createElement(_loading_view2.default, null) : _react2.default.createElement(_display_view2.default, { data: this.state.addressData })
+        loading ? _react2.default.createElement(_loading_view2.default, null) : _react2.default.createElement(_display_view2.default, { balance: this.state.balance,
+          transactions: this.state.transactions,
+          seeMore: this.getMoreTransactions })
       );
     }
   }]);
@@ -20691,21 +20740,25 @@ var _react2 = _interopRequireDefault(_react);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var DisplayView = function DisplayView(props) {
-  return;
-  _react2.default.createElement(
+  return _react2.default.createElement(
     'div',
     null,
-    props.data.balance,
+    props.balance,
     _react2.default.createElement(
       'ul',
       null,
-      props.data.transactions.map(function (tx) {
+      props.transactions.map(function (tx) {
         return _react2.default.createElement(
           'li',
           null,
           tx.time
         );
       })
+    ),
+    _react2.default.createElement(
+      'button',
+      { onClick: props.seeMore },
+      'See More'
     )
   );
 };

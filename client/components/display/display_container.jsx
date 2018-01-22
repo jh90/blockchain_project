@@ -39,13 +39,44 @@ export default class DisplayContainer extends React.Component {
     this.props.socket.send(unsubscribeMessage);
   }
 
+  cleanTransactionData (tx) {
+    const convertedTime = new Date(tx.time * 1000);
+    let txDirection;
+    const cleanInputs = tx.inputs.map((input) => {
+      if (input.prev_out.addr == this.props.address) {
+        txDirection = 'Sent';
+      }
+      const cleanValue = input.prev_out.value / 100000000;
+      const cleanInput = { address: input.prev_out.addr, value: cleanValue };
+      return cleanInput;
+    });
+    const cleanOutputs = tx.out.map((output) => {
+      if (output.addr == this.props.address) {
+        txDirection = 'Received';
+      }
+      const cleanValue = output.value / 100000000;
+      const cleanOutput = { address: output.addr, value: cleanValue };
+      return cleanOutput;
+    });
+    const cleanTx = {
+      inputs: cleanInputs,
+      outputs: cleanOutputs,
+      time: convertedTime,
+      direction: txDirection,
+    };
+    return cleanTx;
+}
+
   getBalanceAndTransactions (address) {
     request.get(`/data?address=${address}&offset=0`)
            .then((response) => {
               const data = JSON.parse(response.text);
+              const cleanTxs = data.transactions.map((tx) => {
+                return this.cleanTransactionData(tx);
+              });
               this.setState({
                 balance: data.balance,
-                transactions: data.transactions,
+                transactions: cleanTxs,
                 isLoading: false,
               });
               this.openChannel(address);
@@ -58,7 +89,10 @@ export default class DisplayContainer extends React.Component {
     request.get(`/data?address=${address}&offset=${offset}`)
            .then((response) => {
               const data = JSON.parse(response.text);
-              const newTxs = [].concat(this.state.transactions, data.transactions);
+              const cleanTxs = data.transactions.map((tx) => {
+                return this.cleanTransactionData(tx);
+              });
+              const newTxs = [].concat(this.state.transactions, cleanTxs);
               const newPageCount = (offset / 50) + 1;
               this.setState({
                 transactions: newTxs,
