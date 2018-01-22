@@ -23,12 +23,7 @@ export default class SearchContainer extends React.Component {
 
   render () {
     return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <input type='text' placeholder='Address' onChange={this.handleChange} />
-          <button type='submit'>Search</button>
-        </form>
-      </div>
+      <SearchView handleChange={this.handleChange} handleSubmit={this.handleSubmit} />
     );
   }
 }

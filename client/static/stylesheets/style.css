@@ -1,0 +1,69 @@
+#search-form {
+  margin-left: 15%;
+  margin-top: 50px;
+  width: 100%;
+}
+
+#search-field {
+  width: 400px;
+  height: 50px;
+  font-size: 18px;
+  padding-left: 15px;
+}
+
+#search-button {
+  margin-left: 20px;
+  width: 130px;
+  height: 45px;
+  font-size: 15px;
+}
+
+#loading {
+  margin-top: 15%;
+  margin-left: 28%;
+  font-size: 80px;
+}
+
+#display {
+  margin-top: 25px;
+  margin-left: 25px;
+}
+
+#balance-div {
+  margin-bottom: 25px;
+  margin-left: 25px;
+  font-size: 20px;
+}
+
+#balance {
+  margin-left: 40px;
+}
+
+.transaction {
+  margin-bottom: 10px;
+  margin-top: 10px;
+  border-top: solid black 3px;
+  width: 70%;
+}
+
+table {
+  border-top: 3px;
+  padding-top: 8px;
+  width: 80%;
+}
+
+td {
+  text-align: left;
+}
+
+.left-col {
+  width: 65%;
+}
+
+.right-col {
+  width: 35%;
+}
+
+.addresses {
+  margin-left: 12px;
+}

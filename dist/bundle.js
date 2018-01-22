@@ -34646,20 +34646,7 @@ var SearchContainer = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(
-          'form',
-          { onSubmit: this.handleSubmit },
-          _react2.default.createElement('input', { type: 'text', placeholder: 'Address', onChange: this.handleChange }),
-          _react2.default.createElement(
-            'button',
-            { type: 'submit' },
-            'Search'
-          )
-        )
-      );
+      return _react2.default.createElement(_search_view2.default, { handleChange: this.handleChange, handleSubmit: this.handleSubmit });
     }
   }]);
 
@@ -34679,50 +34666,31 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
 var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var SearchView = function (_React$Component) {
-  _inherits(SearchView, _React$Component);
-
-  function SearchView() {
-    _classCallCheck(this, SearchView);
-
-    var _this = _possibleConstructorReturn(this, (SearchView.__proto__ || Object.getPrototypeOf(SearchView)).call(this));
-
-    _this.state = {};
-    return _this;
-  }
-
-  _createClass(SearchView, [{
-    key: 'render',
-    value: function render() {
-      return _react2.default.createElement(
-        'div',
-        null,
-        _react2.default.createElement(
-          'form',
-          null,
-          _react2.default.createElement('input', { onChange: this.props.handleChange }),
-          _react2.default.createElement('input', { type: 'submit', onClick: this.props.handleSubmit })
-        )
-      );
-    }
-  }]);
-
-  return SearchView;
-}(_react2.default.Component);
+var SearchView = function SearchView(props) {
+  return _react2.default.createElement(
+    'div',
+    null,
+    _react2.default.createElement(
+      'form',
+      { onSubmit: props.handleSubmit, id: 'search-form' },
+      _react2.default.createElement('input', { type: 'text',
+        placeholder: 'Address',
+        onChange: props.handleChange,
+        id: 'search-field' }),
+      _react2.default.createElement(
+        'button',
+        { type: 'submit', id: 'search-button' },
+        'Search'
+      )
+    )
+  );
+};
 
 exports.default = SearchView;
 
@@ -37306,43 +37274,47 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var TransactionView = function TransactionView(props) {
   return _react2.default.createElement(
     'div',
-    { className: 'transaction' },
+    { className: props.tx.direction },
     _react2.default.createElement(
       'table',
       null,
       _react2.default.createElement(
-        'tr',
+        'tbody',
         null,
         _react2.default.createElement(
-          'th',
+          'tr',
           null,
-          props.tx.direction,
           _react2.default.createElement(
-            'span',
+            'th',
             null,
-            props.tx.time
+            props.tx.direction,
+            _react2.default.createElement(
+              'span',
+              { className: 'time' },
+              props.tx.time
+            )
           )
-        )
-      ),
-      _react2.default.createElement(
-        'tr',
-        null,
-        _react2.default.createElement(
-          'td',
-          null,
-          props.tx.counterparties.map(function (cp) {
-            return _react2.default.createElement(
-              'p',
-              null,
-              cp
-            );
-          })
         ),
         _react2.default.createElement(
-          'td',
+          'tr',
           null,
-          props.tx.value,
-          ' BTC'
+          _react2.default.createElement(
+            'td',
+            null,
+            props.tx.counterparties.map(function (cp) {
+              return _react2.default.createElement(
+                'p',
+                null,
+                cp
+              );
+            })
+          ),
+          _react2.default.createElement(
+            'td',
+            { className: 'amount' },
+            props.tx.value,
+            ' BTC'
+          )
         )
       )
     )

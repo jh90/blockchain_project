@@ -2,10 +2,15 @@ import React from 'react';
 
 const SearchView = (props) => {
   return (
-    <div id='search-div'>
-      <form><input onChange={this.props.handleChange}></input>
-      <input type='submit' onClick={this.props.handleSubmit}/></form>
-    </div>
+    <div>
+        <form onSubmit={props.handleSubmit} id='search-form'>
+          <input type='text'
+                 placeholder='Address'
+                 onChange={props.handleChange}
+                 id='search-field' />
+          <button type='submit' id='search-button'>Search</button>
+        </form>
+      </div>
   );
 }
 

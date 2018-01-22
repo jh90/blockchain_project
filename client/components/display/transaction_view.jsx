@@ -2,25 +2,24 @@ import React from 'react';
 
 const TransactionView = (props) => {
   return (
-    <div className={props.tx.direction}>
+    <div className='transaction'>
       <table>
         <tbody>
           <tr>
-            <th>{props.tx.direction}
-                <span className='time'>{props.tx.time}</span>
-            </th>
+            <td className='left-col'>{props.tx.direction}</td>
+            <td className='right-col'>{props.tx.time}</td>
           </tr>
           <tr>
-            <td>
+            <td className='left-col'>
               {
                 props.tx.counterparties.map((cp) => {
                   return (
-                    <p>{cp}</p>
+                    <p className='addresses'>{cp}</p>
                   );
                 })
               }
             </td>
-            <td className='amount'>{props.tx.value} BTC</td>
+            <td className='right-col'>{props.tx.value} BTC</td>
           </tr>
         </tbody>
       </table>

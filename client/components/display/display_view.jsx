@@ -4,7 +4,7 @@ import TransactionView from './transaction_view.jsx';
 const DisplayView = (props) => {
     return (
       <div id='display'>
-        <div id='balance'>Balance: {props.balance}</div>
+        <div id='balance-div'>Balance: <span id='balance'>{props.balance} BTC</span></div>
         {
           props.transactions.map((tx) => {
             return (
