@@ -91,7 +91,7 @@ export default class DisplayContainer extends React.Component {
                 return this.cleanTransactionData(tx);
               });
               let showMore = false;
-              if (data.totalTxs > (this.state.pageNumber * 50)) {
+              if (data.totalTxs > (this.state.pageCount * 50)) {
                 showMore = true;
               }
               this.setState({
@@ -116,10 +116,14 @@ export default class DisplayContainer extends React.Component {
               });
               const newTxs = [].concat(this.state.transactions, cleanTxs);
               const newPageCount = (offset / 50) + 1;
-              console.log(newPageCount);
+              let more = false;
+              if ((newPageCount * 50) >= this.state.totalTxs) {
+                more = true;
+              }
               this.setState({
                 transactions: newTxs,
                 pageCount: newPageCount,
+                areMore: more,
               });
            });
   }
