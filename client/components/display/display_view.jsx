@@ -12,7 +12,7 @@ const DisplayView = (props) => {
         {
           props.transactions.map((tx) => {
             return (
-              <TransactionView tx={tx} />
+              <TransactionView tx={tx} search={props.search} />
             );
           })
         }

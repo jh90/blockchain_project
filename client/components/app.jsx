@@ -43,7 +43,8 @@ export default class App extends React.Component {
         <SearchContainer handleSearch={this.handleSearch} />
         {
           display ? <DisplayContainer address={this.state.address}
-                                      socket={this.state.websocket} />
+                                      socket={this.state.websocket}
+                                      search={this.handleSearch} />
                   : false
         }
       </div>

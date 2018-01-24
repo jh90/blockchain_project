@@ -83,4 +83,9 @@ td {
 
 .addresses {
   margin-left: 12px;
+  text-decoration: underline;
+}
+
+.addresses:hover {
+  color: blue;
 }

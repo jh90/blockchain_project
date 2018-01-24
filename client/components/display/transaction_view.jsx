@@ -13,8 +13,9 @@ const TransactionView = (props) => {
             <td className='left-col'>
               {
                 props.tx.counterparties.map((cp) => {
+                  const searchCpAddr = () => {props.search(cp);};
                   return (
-                    <p className='addresses'>{cp}</p>
+                    <p className='addresses' onClick={searchCpAddr}>{cp}</p>
                   );
                 })
               }

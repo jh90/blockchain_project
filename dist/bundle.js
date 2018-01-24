@@ -34540,6 +34540,29 @@ var App = function (_React$Component) {
   }
 
   _createClass(App, [{
+    key: 'componentDidMount',
+    value: function componentDidMount() {
+      this.openSocket();
+    }
+  }, {
+    key: 'openSocket',
+    value: function openSocket() {
+      var _this2 = this;
+
+      var btcWebsocketURL = 'wss://ws.blockchain.info/inv';
+      var connection = new WebSocket(btcWebsocketURL);
+      connection.onopen = function () {
+        _this2.setState({ websocket: connection });
+        console.log('socket open');
+      };
+      connection.onclose = function () {
+        console.log('socket closed');
+      };
+      connection.onerror = function (error) {
+        console.log('ERROR: ' + error);
+      };
+    }
+  }, {
     key: 'handleSearch',
     value: function handleSearch(bitcoinAddress) {
       this.setState({ address: bitcoinAddress, showDisplay: true });
@@ -34552,7 +34575,8 @@ var App = function (_React$Component) {
         'div',
         null,
         _react2.default.createElement(_search_container2.default, { handleSearch: this.handleSearch }),
-        display ? _react2.default.createElement(_display_container2.default, { address: this.state.address }) : false
+        display ? _react2.default.createElement(_display_container2.default, { address: this.state.address,
+          socket: this.state.websocket }) : false
       );
     }
   }]);
@@ -34703,10 +34727,6 @@ var _loading_view = __webpack_require__(163);
 
 var _loading_view2 = _interopRequireDefault(_loading_view);
 
-var _websocket = __webpack_require__(164);
-
-var _websocket2 = _interopRequireDefault(_websocket);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -34740,19 +34760,37 @@ var DisplayContainer = function (_React$Component) {
   _createClass(DisplayContainer, [{
     key: 'componentDidMount',
     value: function componentDidMount() {
+      var _this2 = this;
+
       this.getBalanceAndTransactions(this.props.address);
+      this.props.socket.onmessage = function (data) {
+        _this2.handleNewTransaction(data);
+      };
     }
   }, {
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
       if (nextProps.address !== this.props.address) {
+        this.closeChannel(this.props.address);
         this.getBalanceAndTransactions(nextProps.address);
       }
     }
   }, {
+    key: 'openChannel',
+    value: function openChannel(address) {
+      var subscribeMessage = '{\'op\':\'sub_addr\', \'addr\':\'' + address + '\'}';
+      this.props.socket.send(subscribeMessage);
+    }
+  }, {
+    key: 'closeChannel',
+    value: function closeChannel(address) {
+      var unsubscribeMessage = '{\'op\':\'unsub_addr\', \'addr\':\'' + address + '\'}';
+      this.props.socket.send(unsubscribeMessage);
+    }
+  }, {
     key: 'cleanTransactionData',
     value: function cleanTransactionData(tx) {
-      var _this2 = this;
+      var _this3 = this;
 
       var parsedTime = _moment2.default.unix(tx.time);
       var displayTime = parsedTime.format("kk:mm:ss YYYY-MM-DD");
@@ -34761,7 +34799,7 @@ var DisplayContainer = function (_React$Component) {
       var txCounterparties = void 0;
       var inputs = tx.inputs.map(function (input) {
         var btcValue = input.prev_out.value / 100000000;
-        if (input.prev_out.addr == _this2.props.address) {
+        if (input.prev_out.addr == _this3.props.address) {
           txDirection = 'Sent';
           txValue = btcValue;
         }
@@ -34770,7 +34808,7 @@ var DisplayContainer = function (_React$Component) {
       });
       var outputs = tx.out.map(function (output) {
         var btcValue = output.value / 100000000;
-        if (output.addr == _this2.props.address) {
+        if (output.addr == _this3.props.address) {
           txDirection = 'Received';
           txValue = btcValue;
         }
@@ -34793,44 +34831,43 @@ var DisplayContainer = function (_React$Component) {
   }, {
     key: 'getBalanceAndTransactions',
     value: function getBalanceAndTransactions(address) {
-      var _this3 = this;
+      var _this4 = this;
 
       _superagent2.default.get('/data?address=' + address + '&offset=0').then(function (response) {
         var data = JSON.parse(response.text);
         var cleanTxs = data.transactions.map(function (tx) {
-          return _this3.cleanTransactionData(tx);
+          return _this4.cleanTransactionData(tx);
         });
-        if (data.totalTxs > _this3.state.pageNumber * 50) {
-          var _showMore = true;
-        } else {
-          var _showMore2 = false;
+        var showMore = false;
+        if (data.totalTxs > _this4.state.pageNumber * 50) {
+          showMore = true;
         }
-        _this3.setState({
+        _this4.setState({
           balance: data.balance,
           transactions: cleanTxs,
           totalTxs: data.totalTxs,
           isLoading: false,
           areMore: showMore
         });
-        _this3.openChannel(address);
+        _this4.openChannel(address);
       });
     }
   }, {
     key: 'getMoreTransactions',
     value: function getMoreTransactions() {
-      var _this4 = this;
+      var _this5 = this;
 
       var offset = this.state.pageCount * 50;
       var address = this.props.address;
       _superagent2.default.get('/data?address=' + address + '&offset=' + offset).then(function (response) {
         var data = JSON.parse(response.text);
         var cleanTxs = data.transactions.map(function (tx) {
-          return _this4.cleanTransactionData(tx);
+          return _this5.cleanTransactionData(tx);
         });
-        var newTxs = [].concat(_this4.state.transactions, cleanTxs);
+        var newTxs = [].concat(_this5.state.transactions, cleanTxs);
         var newPageCount = offset / 50 + 1;
         console.log(newPageCount);
-        _this4.setState({
+        _this5.setState({
           transactions: newTxs,
           pageCount: newPageCount
         });
@@ -34871,9 +34908,7 @@ var DisplayContainer = function (_React$Component) {
           loadMore: this.getMoreTransactions,
           descending: this.state.descending,
           handleToggle: this.toggleTransactionOrder,
-          areMoreTxs: this.state.areMore }),
-        _react2.default.createElement(_websocket2.default, { address: this.props.address,
-          handleNewTransaction: this.handleNewTransaction })
+          areMoreTxs: this.state.areMore })
       );
     }
   }]);
@@ -37401,99 +37436,6 @@ var LoadingView = function LoadingView() {
 };
 
 exports.default = LoadingView;
-
-/***/ }),
-/* 164 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(1);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Websocket = function (_React$Component) {
-  _inherits(Websocket, _React$Component);
-
-  function Websocket() {
-    _classCallCheck(this, Websocket);
-
-    var _this = _possibleConstructorReturn(this, (Websocket.__proto__ || Object.getPrototypeOf(Websocket)).call(this));
-
-    _this.state = {
-      socket: null
-    };
-    return _this;
-  }
-
-  _createClass(Websocket, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      this.openSocket();
-    }
-  }, {
-    key: 'componentWillReceiveProps',
-    value: function componentWillReceiveProps(nextProps) {
-      if (nextProps.address !== this.props.address) {
-        this.closeChannel(this.props.address);
-        this.openChannel(nextProps.address);
-      }
-    }
-  }, {
-    key: 'openSocket',
-    value: function openSocket() {
-      var _this2 = this;
-
-      var btcWebsocketURL = 'wss://ws.blockchain.info/inv';
-      var connection = new WebSocket(btcWebsocketURL);
-      connection.onopen = function () {
-        _this2.setState({ ws: connection });
-        console.log('socket open');
-      };
-      connection.onclose = function () {
-        console.log('socket closed');
-      };
-      connection.onerror = function (error) {
-        console.log('ERROR: ' + error);
-      };
-      connection.onmessage = function (data) {
-        _this2.props.handleNewTransaction(data);
-      };
-      this.openChannel(this.props.address);
-    }
-  }, {
-    key: 'openChannel',
-    value: function openChannel(address) {
-      var subscribeMessage = '{\'op\':\'sub_addr\', \'addr\':\'' + address + '\'}';
-      this.state.socket.send(subscribeMessage);
-    }
-  }, {
-    key: 'closeChannel',
-    value: function closeChannel(address) {
-      var unsubscribeMessage = '{\'op\':\'unsub_addr\', \'addr\':\'' + address + '\'}';
-      this.props.socket.send(unsubscribeMessage);
-    }
-  }]);
-
-  return Websocket;
-}(_react2.default.Component);
-
-exports.default = Websocket;
 
 /***/ })
 /******/ ]);

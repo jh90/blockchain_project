@@ -157,7 +157,8 @@ export default class DisplayContainer extends React.Component {
                                loadMore={this.getMoreTransactions}
                                descending={this.state.descending}
                                handleToggle={this.toggleTransactionOrder}
-                               areMoreTxs={this.state.areMore} />
+                               areMoreTxs={this.state.areMore}
+                               search={this.props.search} />
       }
       </div>
     );
