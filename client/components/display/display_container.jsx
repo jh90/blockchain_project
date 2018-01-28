@@ -10,7 +10,6 @@ export default class DisplayContainer extends React.Component {
     this.state = {
       balance: null,
       transactions: null,
-      totalTxs: null,
       isLoading: true,
       pageCount: 1,
       descending: true,
@@ -91,13 +90,12 @@ export default class DisplayContainer extends React.Component {
                 return this.cleanTransactionData(tx);
               });
               let showMore = false;
-              if (data.totalTxs > (this.state.pageNumber * 50)) {
+              if (data.totalTxs > 50) {
                 showMore = true;
               }
               this.setState({
                 balance: data.balance,
                 transactions: cleanTxs,
-                totalTxs: data.totalTxs,
                 isLoading: false,
                 areMore: showMore,
               });
@@ -114,12 +112,22 @@ export default class DisplayContainer extends React.Component {
               const cleanTxs = data.transactions.map((tx) => {
                 return this.cleanTransactionData(tx);
               });
-              const newTxs = [].concat(this.state.transactions, cleanTxs);
-              const newPageCount = (offset / 50) + 1;
-              console.log(newPageCount);
+              let newTxs;
+              if (this.state.descending) {
+                newTxs = [].concat(this.state.transactions, cleanTxs);
+              }
+              else {
+                newTxs = [].concat(cleanTxs, this.state.transactions);
+              }
+              const newPageCount = this.state.pageCount + 1;
+              let showMore = false;
+              if (data.totalTxs > (newPageCount * 50)) {
+                showMore = true;
+              }
               this.setState({
                 transactions: newTxs,
                 pageCount: newPageCount,
+                areMore: showMore,
               });
            });
   }
